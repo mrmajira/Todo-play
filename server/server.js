@@ -28,6 +28,19 @@ app.post("/todos",(req,res)=>{
 });
 
 
+app.get("/todos",(req,res)=>{
+    let todos=Todo.find()
+    .then((docs)=>{
+        // console.log(docs);
+        // res.send(docs);
+        console.log("--Successfully found todos: \n",docs);
+        res.send({docs});
+    },(err)=>{
+        console.log("--Err in finding todos: \n",err);  
+        res.status(400).send(err)
+    });
+});
+
 
 app.listen(port,()=>{
     console.log(`Server listening on port: ${port}`);
