@@ -13,16 +13,17 @@ app.use(bodyParser.json());
 
 app.post("/todos",(req,res)=>{
 
-    console.log(req.body);
+    // console.log(req.body);
     let todo = new Todo({
         text:req.body.text
     });
     todo.save()
     .then((doc)=>{
-        console.log("--Successfully saved todo: \n",doc);
-        res.send("--Successfully saved todo: \n"+doc);
+        // console.log("--Successfully saved todo: \n",doc);
+        // res.send("--Successfully saved todo: \n"+doc);
+        res.send(doc);
     },(err)=>{
-        console.log("--Err in saving todo: \n",err);  
+        // console.log("--Err in saving todo: \n",err);  
         res.status(400).send(err);  
     });
 });
@@ -33,10 +34,11 @@ app.get("/todos",(req,res)=>{
     .then((docs)=>{
         // console.log(docs);
         // res.send(docs);
-        console.log("--Successfully found todos: \n",docs);
+        
+        // console.log("--Successfully found todos: \n",docs);
         res.send({docs});
     },(err)=>{
-        console.log("--Err in finding todos: \n",err);  
+        // console.log("--Err in finding todos: \n",err);  
         res.status(400).send(err)
     });
 });
@@ -45,3 +47,6 @@ app.get("/todos",(req,res)=>{
 app.listen(port,()=>{
     console.log(`Server listening on port: ${port}`);
 });
+
+
+module.exports={app};
