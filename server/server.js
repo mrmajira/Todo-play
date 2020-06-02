@@ -1,9 +1,10 @@
 const   express     =   require("express"),
         bodyParser  =   require("body-parser");
 
-const {mongoose}=require("./db/mongoose");
-const {User} = require("./models/user");
-const {Todo} = require("./models/todo");
+const   {mongoose}=     require("./db/mongoose"),
+        {ObjectId}=     require("mongodb"),
+        {User}    =     require("./models/user"),
+        {Todo}    =     require("./models/todo");
 
 
 const port = 3000;
@@ -42,6 +43,39 @@ app.get("/todos",(req,res)=>{
         res.status(400).send(err)
     });
 });
+
+
+
+app.get("/todos/:id",(req,res)=>{
+    // console.log(req.params);
+    // res.send(req.params);
+    // ===================
+    let id = req.params.id;
+    let validId = ObjectId.isValid(id);
+    if(!validId){
+        console.log("todo id not valid");
+        return res.status(404).send("todo id not valid");
+    }
+    Todo.findById(id)
+    .then((todo)=>{
+        if(!todo){
+            console.log("todo not found ");
+            res.status(404).send("todo not found ");
+        }
+        console.log("todo found by id: \n",{todo});
+        res.status(200).send("todo found by id: \n"
+        +todo
+        // +JSON.stringify({todo})
+        );
+    })
+    .catch((err)=>{
+        
+        console.log("--Err in finding todo by id: \n",err);
+        res.status(400).send("--Err in finding todo by id: \n"+err);
+    });
+
+});
+
 
 
 app.listen(port,()=>{
