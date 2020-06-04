@@ -31,13 +31,13 @@ app.post("/todos",(req,res)=>{
 
 
 app.get("/todos",(req,res)=>{
-    let todos=Todo.find()
-    .then((docs)=>{
+    Todo.find()
+    .then((todos)=>{
         // console.log(docs);
         // res.send(docs);
         
         // console.log("--Successfully found todos: \n",docs);
-        res.send({docs});
+        res.send({todos});
     },(err)=>{
         // console.log("--Err in finding todos: \n",err);  
         res.status(400).send(err)
@@ -53,20 +53,17 @@ app.get("/todos/:id",(req,res)=>{
     let id = req.params.id;
     let validId = ObjectId.isValid(id);
     if(!validId){
-        console.log("todo id not valid");
+        // console.log("todo id not valid");
         return res.status(404).send("todo id not valid");
     }
     Todo.findById(id)
     .then((todo)=>{
         if(!todo){
-            console.log("todo not found ");
-            res.status(404).send("todo not found ");
+            // console.log("todo not found ");
+            return res.status(404).send({todo:[]});
         }
-        console.log("todo found by id: \n",{todo});
-        res.status(200).send("todo found by id: \n"
-        +todo
-        // +JSON.stringify({todo})
-        );
+        // console.log("todo found by id: \n",todo);
+        res.status(200).send({todo});
     })
     .catch((err)=>{
         
