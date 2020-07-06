@@ -134,7 +134,55 @@ describe("GET /todos/:id",()=>{
     });
 });
 
-    
+   
+
+describe("DELETE /todos/:id",()=>{
+
+    it("should remove a todo",(done)=>{
+        request(app)
+        .delete(`/todos/${todos[0]._id.toHexString()}`)
+        .expect(200)
+        .expect((res)=>{
+            expect(res.body.delTodo._id).toBe(todos[0]._id.toHexString());
+        })
+        .end((err,res)=>{
+            if(err){
+                return done(err);
+            }
+            hashId=todos[0]._id.toHexString();
+            Todo.findById(hashId)
+            .then((foundTodo)=>{
+                expect(foundTodo).toBeNull();
+                done();
+            })
+            .catch((err)=>done(err));
+
+            // request(app)
+            // .get(`/todos/${hashId}`)
+            // .expect(404)
+            // .expect((res)=>{
+            //     expect(res.body.todo._id).toBeUndefined();
+            // })
+            // .end(done);
+
+        });
+
+    });
+
+    it("should return 404 if todo not found",(done)=>{
+        request(app)
+        .delete(`/todos/${new ObjectId().toHexString()}`)
+        .expect(404)
+        .end(done);
+    });
+
+    it("should return 404 if id not valid",(done)=>{
+        request(app)
+        .delete(`/todos/lol this is not valid id`)
+        .expect(404)
+        .end(done);
+    });
+});
 
     // });
 

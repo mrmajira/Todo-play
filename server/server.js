@@ -60,7 +60,8 @@ app.get("/todos/:id",(req,res)=>{
     .then((todo)=>{
         if(!todo){
             // console.log("todo not found ");
-            return res.status(404).send({todo:[]});
+            return res.status(404).send({todo:[]}); 
+            // return res.status(404).send();
         }
         // console.log("todo found by id: \n",todo);
         res.status(200).send({todo});
@@ -84,7 +85,7 @@ app.delete("/todos/:id",(req,res)=>{
         if(!delTodo){
             return res.status(404).send();
         }
-        res.status(200).send(delTodo);
+        res.status(200).send({delTodo});
     })
     .catch((err)=>{
         res.status(400).send();
