@@ -8,11 +8,18 @@ const mLabURI="mongodb+srv://mrmr:24843924@cluster0-smfdh.mongodb.net/NODE_JS_AN
 // mongodb+srv://<username>:<password>@cluster0-smfdh.mongodb.net/<dbname>?retryWrites=true&w=majority
 // 
 
+// local only
+// mongoose.connect(("mongodb://localhost:27017/TodoApp"),{
+//     useNewUrlParser:true,
+//     useUnifiedTopology:true,
+//     useFindAndModify:false
+// });
 
-
+// online || local
 mongoose.connect(mLabURI ||"mongodb://localhost:27017/TodoApp",{
     useNewUrlParser:true,
-    useUnifiedTopology:true
+    useUnifiedTopology:true,
+    useFindAndModify:false
 });
 
 

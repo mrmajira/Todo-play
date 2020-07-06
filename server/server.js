@@ -73,6 +73,23 @@ app.get("/todos/:id",(req,res)=>{
 
 });
 
+app.delete("/todos/:id",(req,res)=>{
+    let id=req.params.id;
+    let validId=ObjectId.isValid(id);
+    if(!validId){
+        return res.status(404).send();
+    }
+    Todo.findByIdAndRemove(id)
+    .then((delTodo)=>{
+        if(!delTodo){
+            return res.status(404).send();
+        }
+        res.status(200).send(delTodo);
+    })
+    .catch((err)=>{
+        res.status(400).send();
+    });
+});
 
 
 app.listen(port,()=>{
