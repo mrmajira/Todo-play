@@ -5,12 +5,16 @@ const expect    = require("expect"),
 const {app} = require("./../server");      
 const {Todo} = require("./../models/todo");      
 
+
+// --- Seed
 const todos =[{
     _id:new ObjectId(),
     text:"1st thing todo"
 },{
     _id:new ObjectId(),
-    text:"2nd thing todo"
+    text:"2nd thing todo",
+    completed:true,
+    completedAt:6969
 }];
 
 
@@ -183,6 +187,79 @@ describe("DELETE /todos/:id",()=>{
         .end(done);
     });
 });
+
+
+
+describe("PATCH /todos/:id",()=>{
+
+    it("should update todo text & completed->true",(done)=>{
+        hashId=todos[0]._id.toHexString();4
+        todo={
+            text:"updated - test",
+            completed:true
+        }
+
+        request(app)
+        .patch(`/todos/${hashId}`)
+        .send(todo)
+        .expect(200)
+        .expect((res)=>{
+            expect(res.body.todo.completed).toBe(true);
+            expect(typeof res.body.todo.completedAt).toBe("number");
+            expect(res.body.todo.text).toBe("updated - test");
+        })
+        .end(done);
+    //     .end((err,res)=>{
+    //         if(err){
+    //             return done(err);
+    //         }
+    //         Todo.findById(hashId)
+    //         .then((foundTodo)=>{
+    //             expect(foundTodo.completed).toBe(true);
+    //             expect(foundTodo.completedAt).toBeA(Number);
+    //             expect(foundTodo.text).toBe("updated - test");
+    //             done();
+    //         })
+    //         .catch(()=>done(err));
+    //     });
+
+    });
+
+    it("should clear completedAt when todo is not completed",(done)=>{
+        hashId=todos[1]._id.toHexString();
+        todo={
+            completed:false,
+            completedAt:"yesterday lol"
+        }
+
+        request(app)
+        .patch(`/todos/${hashId}`)
+        .send(todo)
+        .expect(200)
+        .end((err,res)=>{
+            if(err)return done(err);
+            Todo.findById(hashId)
+            .then((foundTodo)=>{
+                expect(foundTodo.completed).toBeFalsy();
+                expect(foundTodo.completedAt).toBeNull();
+                done();
+            })
+            .catch((err)=>{
+                done(err)
+            });
+        });
+
+    });
+
+
+});
+
+
+
+
+
+
+
 
     // });
 
