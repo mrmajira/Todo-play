@@ -11,7 +11,7 @@ let token = jwt.sign(data,"secret")
 console.log(token);
 
 let dec= jwt.verify(token,"secret");
-console.log(dec);
+console.log(dec.id);
 
 
 // let m = "i am user number 3";

@@ -1,14 +1,17 @@
 require("./config/config");
 
+
 const   express     =   require("express"),
         bodyParser  =   require("body-parser"),
         _           =   require("lodash"),
         jwt         =   require("jsonwebtoken");
 
-const   {mongoose}=     require("./db/mongoose"),
-        {ObjectId}=     require("mongodb"),
-        {User}    =     require("./models/user"),
-        {Todo}    =     require("./models/todo");
+const   {mongoose}        =     require("./db/mongoose"),
+        {ObjectId}        =     require("mongodb"),
+        {User}            =     require("./models/user"),
+        {Todo}            =     require("./models/todo"),
+        {authenticate}    =     require("./middleware/authenticate");
+
 const user = require("./models/user");
 
 
@@ -133,6 +136,12 @@ app.post("/users",(req,res)=>{
 
 });
 
+
+
+
+app.get("/users/me",authenticate,(req,res)=>{
+    res.status(200).send(req.user);
+});
 
 app.listen(port,()=>{
     console.log(`Server listening on port: ${port}`);

@@ -48,10 +48,37 @@ const   mongoose    =   require("mongoose"),
         return user.save()
         .then(()=>{
             return token;
-        })
-        
+        })        
     }
 
+    UserSchema.statics.findByToken=function (token) {
+        let User =this;
+        // let decoded=jwt.verify(token,"secret");
+        let decoded;
+
+        try{
+            decoded= jwt.verify(token,"secret");
+        }catch(err){
+            return Promise.reject();
+        }
+
+        return User.findOne({
+            "_id":decoded._id,
+            "tokens.token":token,
+            "tokens.access":"auth"
+        });
+
+        // return User.findById(decoded._id)
+        // .then((foundUser)=>{
+        //     return foundUser;
+        // })
+        // .catch((err)=>{
+        //     console.log("--Err in finding by token");
+        //     console.log(err);
+        // });
+
+
+    }
 
 
 
