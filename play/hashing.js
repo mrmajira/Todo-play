@@ -25,6 +25,11 @@ const bcrypt    =   require("bcryptjs");
 //     console.log(res);  
 // })
 
+// bs={arr:[{a:2}]};
+// a=1;
+// bs=bs.arr.concat([{a}]);
+// // bs.arr.push({a});
+// console.log(bs);
 
 // // jwt.sign();
 let data={

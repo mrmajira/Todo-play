@@ -93,9 +93,9 @@ const   mongoose    =   require("mongoose"),
         let user=this;
 
         if(user.isModified("password")){
-            bycrypt.genSalt(10,(err,salt)=>{
+            bcrypt.genSalt(10,(err,salt)=>{
                 if(err){return console.log(err);}
-                bycrypt.hash(user.password,salt,(err,hash)=>{
+                bcrypt.hash(user.password,salt,(err,hash)=>{
                     if(err){return console.log(err);}
                     user.password=hash;
                     next();

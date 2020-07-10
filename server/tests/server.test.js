@@ -1,11 +1,13 @@
 const expect    = require("expect"),
       request   = require("supertest"),
       {ObjectId}= require("mongodb");
+    //   jwt       = require("jsonwebtoken");
 
 const {app}                 = require("./../server"),      
       {Todo}                = require("./../models/todo"),      
       {todos,populateTodos} = require("./seed/seed"),
       {users,populateUsers} = require("./seed/seed");  
+
 const user = require("../models/user");
 const { User } = require("../models/user");
 
@@ -290,6 +292,62 @@ describe("POST /users" ,()=>{
             expect(res.body.user).toBeUndefined();
         })
         .end(done)
+    });
+
+});
+
+
+describe("POST /users/login" ,()=>{
+
+    it("should login user and return auth token",(done)=>{
+
+        request(app)
+        .post("/users/login")
+        .send({
+            email:users[0].email,
+            password:users[0].password
+        })
+        .expect(200)
+        .expect((res)=>{
+            expect(res.body._id).toBe(users[0]._id.toHexString())
+            expect(res.headers["x-auth"]).toBeTruthy();
+        })
+        .end((err,res)=>{
+            if (err) return done(err);
+
+            User.findById(res.body._id)
+            .then((user)=>{
+                // console.log(user.tokens);
+                expect(user.tokens[1].token).toBe(res.headers["x-auth"]);
+                // expect(user.tokens[0]).toMatchObject({
+                //     access:"auth",
+                //     token:res.headers["x-auth"]
+                // })
+                // dec=jwt.verify(res.headers["x-auth"],"secret");
+                // // console.log(dec._id);
+                // // console.log("user : "+user._id);
+                // // expect(dec._id).toBe(user._id);
+                // expect(dec._id).toBe(users[0]._id.toHexString());
+                done();
+            })
+            .catch((err)=>done(err));
+        });
+    });
+
+    it("should reject invalid login",(done)=>{
+
+        request(app)
+        .post("/users/login")
+        .send({
+            email:users[0].email,
+            password:"wrong pw"
+        })
+        .expect(400)
+        .expect((res)=>{
+            expect(res.body).toEqual({});
+            expect(res.headers["x-auth"]).toBeUndefined();
+        })
+        .end(done);
     });
 
 });
