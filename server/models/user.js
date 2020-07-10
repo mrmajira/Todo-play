@@ -2,7 +2,7 @@ const   mongoose    =   require("mongoose"),
         validator   =   require("validator"),
         jwt         =   require("jsonwebtoken"),
         _           =   require("lodash"),
-        bycrypt     =   require("bcryptjs");
+        bcrypt     =   require("bcryptjs");
 
     let UserSchema = new mongoose.Schema({
         email:{
@@ -42,7 +42,7 @@ const   mongoose    =   require("mongoose"),
     };
 
     UserSchema.methods.generateAuthToken=function(){
-        var user=this;
+        let user=this;
         let access="auth";
         let token=jwt.sign({_id:user._id.toHexString(),access},"secret").toString();
 
@@ -55,7 +55,6 @@ const   mongoose    =   require("mongoose"),
 
     UserSchema.statics.findByToken=function (token) {
         let User =this;
-        // let decoded=jwt.verify(token,"secret");
         let decoded;
 
         try{
@@ -69,37 +68,43 @@ const   mongoose    =   require("mongoose"),
             "tokens.token":token,
             "tokens.access":"auth"
         });
-
-        // return User.findById(decoded._id)
-        // .then((foundUser)=>{
-        //     return foundUser;
-        // })
-        // .catch((err)=>{
-        //     console.log("--Err in finding by token");
-        //     console.log(err);
-        // });
-
-
     }
+                       
+    UserSchema.statics.findByCredentials=function(email,password){
+        let User=this;
 
+        return User.findOne({email})
+        .then((user)=>{
+            if(!user) return Promise.reject();
 
-UserSchema.pre("save",function(next){
-    let user=this;
-
-    if(user.isModified("password")){
-        bycrypt.genSalt(10,(err,salt)=>{
-            if(err){return console.log(err);}
-            bycrypt.hash(user.password,salt,(err,hash)=>{
-                if(err){return console.log(err);}
-                user.password=hash;
-                next();
+            return new Promise((resolve,reject)=>{                
+                bcrypt.compare(password,user.password,(err,result)=>{                    
+                    if(err||!result) reject();
+                    else resolve(user);
+                });
             });
             
-        });
-    }else{
-        next();
+        })
+
+        
     }
-});
+
+    UserSchema.pre("save",function(next){
+        let user=this;
+
+        if(user.isModified("password")){
+            bycrypt.genSalt(10,(err,salt)=>{
+                if(err){return console.log(err);}
+                bycrypt.hash(user.password,salt,(err,hash)=>{
+                    if(err){return console.log(err);}
+                    user.password=hash;
+                    next();
+                });               
+            });
+        }else{
+            next();
+        }
+    });
 
 let User = mongoose.model("User",UserSchema);
 

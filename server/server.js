@@ -4,7 +4,8 @@ require("./config/config");
 const   express     =   require("express"),
         bodyParser  =   require("body-parser"),
         _           =   require("lodash"),
-        jwt         =   require("jsonwebtoken");
+        jwt         =   require("jsonwebtoken"),
+        bcrypt      =   require("bcryptjs");
 
 const   {mongoose}        =     require("./db/mongoose"),
         {ObjectId}        =     require("mongodb"),
@@ -142,6 +143,39 @@ app.post("/users",(req,res)=>{
 app.get("/users/me",authenticate,(req,res)=>{
     res.status(200).send(req.user);
 });
+
+app.post("/users/login",(req,res)=>{
+    body=_.pick(req.body,["email","password"]);
+
+    User.findByCredentials(body.email,body.password)
+    .then((user)=>{
+        return user.generateAuthToken()
+        .then((token)=>{
+            // req.headers["x-auth"]=token;
+            // res.status(200).send(user)
+            // res.status(200).send(token)
+            res.header("x-auth",token).status(200).send(user)
+
+        })
+    })
+    .catch((err)=>{
+        console.log(err);
+        res.status(400).send();
+    });
+
+
+
+    // User.findOne({email:req.body.email})
+    // .then((user)=>{
+    //     if(!user)return res.status(404).send();
+    //     bcrypt.compare(req.body.password,user.password,(err,result)=>{
+    //         if(err || !result)return res.status(400).send();
+    //         res.status(200).send(user)
+    //     }) 
+    // })
+    // .catch((err)=>res.status(400).send());
+});
+
 
 app.listen(port,()=>{
     console.log(`Server listening on port: ${port}`);

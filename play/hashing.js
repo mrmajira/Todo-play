@@ -3,36 +3,36 @@ const {SHA256}  =   require("crypto-js");
 const jwt       =   require("jsonwebtoken");
 const bcrypt    =   require("bcryptjs");
 
-let pw = "123456";
+// let pw = "123456";
 
-bcrypt.genSalt(10,(err,salt)=>{
-    bcrypt.hash(pw,salt,(err,hash)=>{
-        console.log(hash);
+// bcrypt.genSalt(10,(err,salt)=>{
+//     bcrypt.hash(pw,salt,(err,hash)=>{
+//         console.log(hash);
         
-    });
-});
+//     });
+// });
 
-let hashPassword= "$2a$10$OLLwDSjAAN9t1JodKHaPv.w3DCNLclwk8vb8znf4Ih5Fj5LL8vjR2"
-let hash2= "$2a$10$nB6.aIONln6D4QDXxIlOTOzq3cex7NsL2AdtheKrHgvXQi5sYXOom"
+// let hashPassword= "$2a$10$OLLwDSjAAN9t1JodKHaPv.w3DCNLclwk8vb8znf4Ih5Fj5LL8vjR2"
+// let hash2= "$2a$10$nB6.aIONln6D4QDXxIlOTOzq3cex7NsL2AdtheKrHgvXQi5sYXOom"
 
-bcrypt.compare(pw,hashPassword,(err,res)=>{
-    console.log(res);  
-})
-bcrypt.compare(hash2,hashPassword,(err,res)=>{
-    console.log(res);  
-})
-bcrypt.compare(pw,hash2,(err,res)=>{
-    console.log(res);  
-})
+// bcrypt.compare(pw,hashPassword,(err,res)=>{
+//     console.log(res);  
+// })
+// bcrypt.compare(hash2,hashPassword,(err,res)=>{
+//     console.log(res);  
+// })
+// bcrypt.compare(pw,hash2,(err,res)=>{
+//     console.log(res);  
+// })
 
 
 // // jwt.sign();
-// let data={
-//     id:4
-// };
+let data={
+    id:4
+};
 
-// let token = jwt.sign(data,"secret")
-// console.log(token);
+let token = jwt.sign(data,"secret")
+console.log(token);
 
 // let dec= jwt.verify(token,"secret");
 // console.log(dec.id);
