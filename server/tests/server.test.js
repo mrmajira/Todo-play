@@ -352,6 +352,33 @@ describe("POST /users/login" ,()=>{
 
 });
 
+describe("DELETE /users/me/token" ,()=>{
 
+    it("should logout successfully",(done)=>{
+
+        request(app)
+        .delete("/users/me/token")
+        .set("x-auth",users[0].tokens[0].token)
+        .expect(200)
+        .expect((res)=>{
+            expect(res.body).toEqual({});
+            expect(res.headers["x-auth"]).toBeUndefined();
+        })
+        .end((err,res)=>{
+            if(err)return done(err);
+
+            User.findById(users[0]._id)
+            .then((user)=>{
+                expect(user.tokens).not.toContain({
+                    access:"auth",
+                    token:users[0].tokens[0].token
+                });
+                done();
+            })
+            .catch((err)=>done(err))
+        })
+    })
+
+});
 
 
