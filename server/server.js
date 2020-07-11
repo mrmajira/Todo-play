@@ -21,25 +21,19 @@ const user = require("./models/user");
 
 let app=express();
 const port = process.env.PORT ;
-// const port = process.env.PORT||3000  ;
 
 app.use(bodyParser.json());
 
 app.post("/todos",authenticate,(req,res)=>{
 
-    // console.log(req.body);
     let todo = new Todo({
         text:req.body.text,
         _creator:req.user._id
     });
     todo.save()
-    .then((doc)=>{
-        // console.log("--Successfully saved todo: \n",doc);
-        // res.send("--Successfully saved todo: \n"+doc);
-        
+    .then((doc)=>{        
         res.header("x-auth",req.token).send(doc);
     },(err)=>{
-        // console.log("--Err in saving todo: \n",err);  
         res.status(400).send(err);  
     });
 });
@@ -64,24 +58,14 @@ app.get("/todos/:id",authenticate,(req,res)=>{
     if(!validId){
         return res.status(404).send("todo id not valid");
     }
-    // Todo.findById(id)
     Todo.findOne({
         _id:id,
         _creator:req.user._id
     })
     .then((todo)=>{
-        // let a=req.user._id;
-        // let b=todo._creator;
-
-        // console.log("req.user._id :"+req.user._id);
-        // console.log("todo._creator: "+todo._creator);
-        // console.log(a==b);
         if(!todo){
             return res.status(404).send({todo:[]}); 
         }        
-        // else if(req.user._id!=todo._creator){
-        //     return res.status(401).send("Authorization failed")
-        // }
         res.status(200).send({todo});
     })
     .catch((err)=>{
@@ -98,7 +82,6 @@ app.delete("/todos/:id",authenticate,(req,res)=>{
     if(!validId){
         return res.status(404).send();
     }
-    // Todo.findByIdAndRemove(id)
     Todo.findOneAndRemove({
         _id:id,
         _creator:req.user._id
@@ -107,9 +90,6 @@ app.delete("/todos/:id",authenticate,(req,res)=>{
         if(!delTodo){
             return res.status(404).send();
         }
-        // else if(req.user._id!==delTodo._creator){
-        //     return res.status(401).send("Authorization failed")
-        // }
         res.status(200).send({delTodo});
     })
     .catch((err)=>{
@@ -131,16 +111,12 @@ app.patch("/todos/:id",authenticate,(req,res)=>{
         body.completedAt=null;
     }
 
-    // Todo.findByIdAndUpdate(id,{$set:body},{new:true})
     Todo.findOneAndUpdate({
         _id:id,
         _creator:req.user._id
     },{$set:body},{new:true})
     .then((todo)=>{
         if(!todo) return res.status(404).send()
-        // else if(req.user._id!==todo._creator){
-        //     return res.status(401).send("Authorization failed")
-        // }
         res.status(200).send({todo});
     })
     .catch((err)=>{
@@ -182,29 +158,13 @@ app.post("/users/login",(req,res)=>{
     .then((user)=>{
         return user.generateAuthToken()
         .then((token)=>{
-            // req.headers["x-auth"]=token;
-            // res.status(200).send(user)
-            // res.status(200).send(token)
             res.header("x-auth",token).status(200).send(user)
 
         })
     })
     .catch((err)=>{
-        // console.log(err);
         res.status(400).send();
     });
-
-
-
-    // User.findOne({email:req.body.email})
-    // .then((user)=>{
-    //     if(!user)return res.status(404).send();
-    //     bcrypt.compare(req.body.password,user.password,(err,result)=>{
-    //         if(err || !result)return res.status(400).send();
-    //         res.status(200).send(user)
-    //     }) 
-    // })
-    // .catch((err)=>res.status(400).send());
 });
 
 app.delete("/users/me/token",authenticate,(req,res)=>{

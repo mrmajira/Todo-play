@@ -2,7 +2,7 @@ const   mongoose    =   require("mongoose"),
         validator   =   require("validator"),
         jwt         =   require("jsonwebtoken"),
         _           =   require("lodash"),
-        bcrypt     =   require("bcryptjs");
+        bcrypt      =   require("bcryptjs");
 
     let UserSchema = new mongoose.Schema({
         email:{
@@ -44,7 +44,7 @@ const   mongoose    =   require("mongoose"),
     UserSchema.methods.generateAuthToken=function(){
         let user=this;
         let access="auth";
-        let token=jwt.sign({_id:user._id.toHexString(),access},"secret").toString();
+        let token=jwt.sign({_id:user._id.toHexString(),access},process.env.JWT_SECRET).toString();
 
         user.tokens=user.tokens.concat([{access,token}])
         return user.save()
@@ -68,7 +68,7 @@ const   mongoose    =   require("mongoose"),
         let decoded;
 
         try{
-            decoded= jwt.verify(token,"secret");
+            decoded= jwt.verify(token,process.env.JWT_SECRET);
         }catch(err){
             return Promise.reject();
         }
