@@ -25,17 +25,19 @@ const port = process.env.PORT ;
 
 app.use(bodyParser.json());
 
-app.post("/todos",(req,res)=>{
+app.post("/todos",authenticate,(req,res)=>{
 
     // console.log(req.body);
     let todo = new Todo({
-        text:req.body.text
+        text:req.body.text,
+        _creator:req.user._id
     });
     todo.save()
     .then((doc)=>{
         // console.log("--Successfully saved todo: \n",doc);
         // res.send("--Successfully saved todo: \n"+doc);
-        res.send(doc);
+        
+        res.header("x-auth",req.token).send(doc);
     },(err)=>{
         // console.log("--Err in saving todo: \n",err);  
         res.status(400).send(err);  
@@ -43,8 +45,10 @@ app.post("/todos",(req,res)=>{
 });
 
 
-app.get("/todos",(req,res)=>{
-    Todo.find()
+app.get("/todos",authenticate,(req,res)=>{    
+    Todo.find({
+        _creator:req.user._id
+    })
     .then((todos)=>{
         res.send({todos});
     },(err)=>{
@@ -54,17 +58,30 @@ app.get("/todos",(req,res)=>{
 
 
 
-app.get("/todos/:id",(req,res)=>{
+app.get("/todos/:id",authenticate,(req,res)=>{
     let id = req.params.id;
     let validId = ObjectId.isValid(id);
     if(!validId){
         return res.status(404).send("todo id not valid");
     }
-    Todo.findById(id)
+    // Todo.findById(id)
+    Todo.findOne({
+        _id:id,
+        _creator:req.user._id
+    })
     .then((todo)=>{
+        // let a=req.user._id;
+        // let b=todo._creator;
+
+        // console.log("req.user._id :"+req.user._id);
+        // console.log("todo._creator: "+todo._creator);
+        // console.log(a==b);
         if(!todo){
             return res.status(404).send({todo:[]}); 
-        }
+        }        
+        // else if(req.user._id!=todo._creator){
+        //     return res.status(401).send("Authorization failed")
+        // }
         res.status(200).send({todo});
     })
     .catch((err)=>{
@@ -75,17 +92,24 @@ app.get("/todos/:id",(req,res)=>{
 
 });
 
-app.delete("/todos/:id",(req,res)=>{
+app.delete("/todos/:id",authenticate,(req,res)=>{
     let id=req.params.id;
     let validId=ObjectId.isValid(id);
     if(!validId){
         return res.status(404).send();
     }
-    Todo.findByIdAndRemove(id)
+    // Todo.findByIdAndRemove(id)
+    Todo.findOneAndRemove({
+        _id:id,
+        _creator:req.user._id
+    })
     .then((delTodo)=>{
         if(!delTodo){
             return res.status(404).send();
         }
+        // else if(req.user._id!==delTodo._creator){
+        //     return res.status(401).send("Authorization failed")
+        // }
         res.status(200).send({delTodo});
     })
     .catch((err)=>{
@@ -93,7 +117,7 @@ app.delete("/todos/:id",(req,res)=>{
     });
 });
 
-app.patch("/todos/:id",(req,res)=>{
+app.patch("/todos/:id",authenticate,(req,res)=>{
     let id=req.params.id;
     let body=_.pick(req.body,["text","completed"])    
     let validId=ObjectId.isValid(id);
@@ -107,9 +131,16 @@ app.patch("/todos/:id",(req,res)=>{
         body.completedAt=null;
     }
 
-    Todo.findByIdAndUpdate(id,{$set:body},{new:true})
+    // Todo.findByIdAndUpdate(id,{$set:body},{new:true})
+    Todo.findOneAndUpdate({
+        _id:id,
+        _creator:req.user._id
+    },{$set:body},{new:true})
     .then((todo)=>{
         if(!todo) return res.status(404).send()
+        // else if(req.user._id!==todo._creator){
+        //     return res.status(401).send("Authorization failed")
+        // }
         res.status(200).send({todo});
     })
     .catch((err)=>{

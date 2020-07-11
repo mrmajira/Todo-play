@@ -6,24 +6,7 @@ const   {Todo}      =   require("../../models/todo"),
 
 
 
-const todos =[{
-    _id:new ObjectId(),
-    text:"1st thing todo"
-},{
-    _id:new ObjectId(),
-    text:"2nd thing todo",
-    completed:true,
-    completedAt:6969
-}];
 
-
-let populateTodos = (done)=>{
-        Todo.deleteMany({})
-        .then(()=>{
-            Todo.insertMany(todos)
-            .then(()=>done());
-        });
-}
 
 const userOneId=new ObjectId();
 const userTwoId=new ObjectId();
@@ -67,5 +50,36 @@ let populateUsers=(done)=>{
     .then(()=>done());
 
 }
+
+
+const todos =[{
+    _id:new ObjectId(),
+    text:"1st thing todo",
+    _creator:userOneId
+},{
+    _id:new ObjectId(),
+    text:"2nd thing todo",
+    completed:true,
+    completedAt:6969,
+    _creator:userOneId
+},{
+    _id:new ObjectId(),
+    text:"3rd thing todo",
+    completed:true,
+    completedAt:6969,
+    _creator:userTwoId
+}];
+
+
+let populateTodos = (done)=>{
+        Todo.deleteMany({})
+        .then(()=>{
+            Todo.insertMany(todos)
+            .then(()=>done());
+        });
+}
+
+
+
 
 module.exports={todos,populateTodos,users,populateUsers};
